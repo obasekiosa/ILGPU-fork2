@@ -16,6 +16,7 @@ env:
   PULUMI_STACK_NAME: ${{ github.event.workflow_run.id }}
   GS_BUCKET: ${{ secrets.GS_BUCKET }}
 
+# demo
 jobs:
   deploy-runners:
     runs-on: ubuntu-latest
