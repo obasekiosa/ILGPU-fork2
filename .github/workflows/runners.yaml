@@ -25,11 +25,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Prepare artifacts
+        run: |
+          mkdir -p artifacts
+          cp config.yaml artifacts
+
       - name: Upload config
         uses: actions/upload-artifact@v2
         with:
           name: pulumi-config
-          path: config.yaml
+          path: artifacts
           retention-days: 1
 
       - name: Checkout Pulumi Ephemeral Github Runner project
@@ -39,9 +44,10 @@ jobs:
           ref: main
 
       - name: Download config
-        uses: actions/upload-artifact@v2
+        uses: actions/download-artifact@v2
         with:
           name: pulumi-config
+          path: artifacts
 
       - name: Setup Node
         uses: actions/setup-node@v2
@@ -54,7 +60,7 @@ jobs:
           npm install
           pulumi login $GS_BUCKET
           pulumi stack init -s $PULUMI_STACK_NAME
-          pulumi up --diff --config-file config.yaml -y
+          pulumi up --diff --config-file artifacts/config.yaml -y
 
   destroy-runners:
     runs-on: ubuntu-latest
@@ -64,11 +70,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Prepare artifacts
+        run: |
+          mkdir -p artifacts
+          cp config.yaml artifacts
+
       - name: Upload config
         uses: actions/upload-artifact@v2
         with:
           name: pulumi-config
-          path: config.yaml
+          path: artifacts
           retention-days: 1
 
       - name: Checkout Pulumi Ephemeral Github Runner project
@@ -78,9 +89,10 @@ jobs:
           ref: main
 
       - name: Download config
-        uses: actions/upload-artifact@v2
+        uses: actions/download-artifact@v2
         with:
           name: pulumi-config
+          path: artifacts
 
       - name: Execute Pulumi
         run: |
@@ -88,5 +100,5 @@ jobs:
           npm install
           pulumi login $GS_BUCKET
           pulumi stack select $PULUMI_STACK_NAME
-          pulumi destroy --config-file config.yaml -y
+          pulumi destroy --config-file artifacts/config.yaml -y
           pulumi stack rm $PULUMI_STACK_NAME -y
