@@ -15,7 +15,6 @@ env:
   GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
   PULUMI_STACK_NAME: ${{ github.event.workflow_run.id }}
   GS_BUCKET: ${{ secrets.GS_BUCKET }}
-  RUNNER_REPO: pavlovic-ivan/ephemeral-github-runner-gcp
 
 jobs:
   deploy-runners:
@@ -36,7 +35,7 @@ jobs:
       - name: Checkout Pulumi Ephemeral Github Runner project
         uses: actions/checkout@v2
         with:
-          repository: $RUNNER_REPO
+          repository: pavlovic-ivan/ephemeral-github-runner-gcp
           ref: main
 
       - name: Download config
@@ -75,7 +74,7 @@ jobs:
       - name: Checkout Pulumi Ephemeral Github Runner project
         uses: actions/checkout@v2
         with:
-          repository: $RUNNER_REPO
+          repository: pavlovic-ivan/ephemeral-github-runner-gcp
           ref: main
 
       - name: Download config
