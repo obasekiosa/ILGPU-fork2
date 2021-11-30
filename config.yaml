@@ -1,5 +1,5 @@
 config:
-  ephemeral-github-runner:bootDiskSizeInGB: 200
+  ephemeral-github-runner:bootDiskSizeInGB: 500
   ephemeral-github-runner:bootDiskType: pd-balanced
   ephemeral-github-runner:env: dev
   ephemeral-github-runner:ghRunnerName: orville
