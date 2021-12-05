@@ -3,7 +3,7 @@ config:
   ephemeral-github-runner:bootDiskType: pd-balanced
   ephemeral-github-runner:env: dev
   ephemeral-github-runner:ghRunnerName: orville
-  ephemeral-github-runner:machineImage: projects/gr-oss-251320/global/images/c0-deeplearning-common-cu113-v20211105-debian-10-ghr22850
+  ephemeral-github-runner:machineImage: projects/gr-oss-251320/global/images/c0-deeplearning-common-cu113-v20211105-debian-10-ghrv22850
   ephemeral-github-runner:machineType: a2-highgpu-1g
   ephemeral-github-runner:repo: ILGPU-fork2
   ephemeral-github-runner:repoOwner: pavlovic-ivan
