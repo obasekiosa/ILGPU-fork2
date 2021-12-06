@@ -37,7 +37,7 @@ jobs:
   test-library:
     strategy:
       matrix:
-        os: cuda
+        os: [cuda]
         library: [ILGPU.Algorithms]
         framework: [netcoreapp3.1, net5.0]
       fail-fast: false
