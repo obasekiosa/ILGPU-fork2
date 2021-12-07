@@ -8,7 +8,7 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  # Run tests for all supported combinations of OS/library/framework. 
+  # Run tests for all supported combinations of OS/library/framework.
   test-library:
     strategy:
       matrix:
