@@ -82,7 +82,7 @@ public sealed class TestConfig
     public static readonly string TestParallelizationEnvironmentVariable =
         "ILGPU_TEST_PARALLELIZATION_LEVEL";
 
-    private const int DefaultParallelizationLevel = 4;
+    private const int DefaultParallelizationLevel = 1;
 
     public static Lazy<int> ParallelizationLevel =>
         new Lazy<int>(() =>
