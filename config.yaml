@@ -3,7 +3,7 @@ config:
   ephemeral-github-runner:bootDiskType: pd-balanced
   ephemeral-github-runner:env: dev
   ephemeral-github-runner:ghRunnerName: orville
-  ephemeral-github-runner:machineImage: projects/gr-oss-251320/global/images/c0-deeplearning-common-cu113-v20211202-debian-10-ghrv22850
+  ephemeral-github-runner:machineImage: projects/gr-oss-251320/global/images/ubuntu-2004-focal-v20211202-ghrv22851
   ephemeral-github-runner:machineType: a2-highgpu-1g
   ephemeral-github-runner:repo: ILGPU-fork2
   ephemeral-github-runner:repoOwner: pavlovic-ivan
@@ -11,4 +11,3 @@ config:
   ephemeral-github-runner:serviceAccountEmail: pulumi@gr-oss-251320.iam.gserviceaccount.com
   ephemeral-github-runner:serviceAccountScopes: https://www.googleapis.com/auth/cloud-platform
   ephemeral-github-runner:zone: europe-west4-a
-  ephemeral-github-runner:runnerVersion: 2.285.0
