@@ -51,8 +51,4 @@ jobs:
         run: dotnet test --configuration=Release --framework=${{ matrix.framework }} -p:TreatWarningsAsErrors=true --logger GitHubActions Src/${{ matrix.library }}.Tests.${{ steps.test-flavor.outputs.flavor }}
         env:
           ILGPU_CLEAN_TESTS: ${{ github.event_name == 'schedule' || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))) }}
-<<<<<<< HEAD:.github/workflows/simple-ci.yaml.bckp
-          ILGPU_TEST_PARALLELIZATION_LEVEL: 1
-=======
           ILGPU_TEST_PARALLELIZATION_LEVEL: ${{ steps.test-parallel.outputs.testParallel }}
->>>>>>> 81e89169bdd28525847266ab3394343b245dd3b3:.github/workflows/simple-ci.yaml
