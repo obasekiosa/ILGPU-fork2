@@ -1,12 +1,12 @@
 name: CI
 
 on:
-  push:
-  pull_request:
+  # push:
+  # pull_request:
   schedule:
     # Run daily at 00:00 so we get notified if CI is broken before a pull request
     # is submitted.
-    - cron:  '0 0 * * *'
+    - cron:  '0 22 * * *'
 
 env:
   DOTNET_NOLOGO: true
@@ -92,7 +92,10 @@ jobs:
             )
           ) && os+=("macos-latest")
 
-          [ "${{ github.event.repository.fork }}" == "false" ] && os+=("cuda")
+          (
+            [ "${{ github.event_name }}" == "schedule" ] || 
+            [ "${{ github.event.repository.fork }}" == "false" ]
+          ) && os+=("cuda")
 
           echo "::set-output name=os::$(jq -cn '$ARGS.positional' --args ${os[@]})"
     outputs:
@@ -159,8 +162,8 @@ jobs:
         shell: bash
         run: echo ::set-output name=flavor::$([[ "${{ matrix.os }}" == "cuda" ]] && echo "Cuda" || echo "CPU")
 
-      - name: Set values
-        id: values
+      - name: Prepare environment
+        id: envvars
         shell: bash
         run: |
           if [[ ${{ github.event_name == 'schedule' || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))) }} ]]; then
@@ -173,11 +176,11 @@ jobs:
 
       - name: Debug values
         run: echo $ILGPU_CLEAN_TESTS $ILGPU_TEST_PARALLELIZATION_LEVEL
-        env: ${{ fromJson(steps.values.outputs.json) }}
+        env: ${{ fromJson(steps.envvars.outputs.json) }}
 
       - name: Build and test
         run: dotnet test --configuration=Release --framework=${{ matrix.framework }} -p:TreatWarningsAsErrors=true --logger GitHubActions Src/${{ matrix.library }}.Tests.${{ steps.test-flavor.outputs.flavor }} -- /Parallel
-        env: ${{ fromJson(steps.values.outputs.json) }}
+        env: ${{ fromJson(steps.envvars.outputs.json) }}
 
   # Ensure that ILGPU libraries are built using the same version tag.
   check-version:
