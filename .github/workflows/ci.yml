@@ -178,8 +178,7 @@ jobs:
 
       - name: Build and test
         run: dotnet test --configuration=Release --framework=${{ matrix.framework }} -p:TreatWarningsAsErrors=true --logger GitHubActions Src/${{ matrix.library }}.Tests.${{ steps.test-flavor.outputs.flavor }} -- /Parallel
-        # env: ${{ fromJson(steps.envvars.outputs.json) }}
-        env:
+        env: ${{ fromJson(steps.envvars.outputs.json) }}
           
 
   # Ensure that ILGPU libraries are built using the same version tag.
