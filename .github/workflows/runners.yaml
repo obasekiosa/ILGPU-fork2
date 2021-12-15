@@ -19,7 +19,7 @@ env:
 jobs:
   deploy-runners:
     runs-on: ubuntu-latest
-    if: ${{ github.event.action == 'requested' && github.event.repository.fork == 'false' }}
+    if: ${{ github.event.action == 'requested' && !github.event.repository.fork }}
     environment: cuda-test-infra
     steps:
       - name: Checkout
@@ -64,7 +64,7 @@ jobs:
 
   destroy-runners:
     runs-on: ubuntu-latest
-    if: ${{ github.event.action == 'completed' && github.event.repository.fork == 'false' }}
+    if: ${{ github.event.action == 'completed' && !github.event.repository.fork }}
     environment: cuda-test-infra
     steps:
       - name: Checkout
