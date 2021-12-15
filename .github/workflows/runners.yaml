@@ -17,9 +17,27 @@ env:
   GS_BUCKET: ${{ secrets.GS_BUCKET }}
 
 jobs:
+  is-fork:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Detect fork status
+        id: detect-fork-status
+        run: |
+          upstream=false
+          
+          (
+            [ "${{ github.event.repository.fork }}" == "false" ] || 
+            [ $GITHUB_REPOSITORY == "${{ github.repository }}" ]
+          ) && upstream=true
+
+          echo "::set-output name=usptream::$upstream"
+    outputs:
+      upstream: ${{ steps.detect-fork-status.outputs.upstream }}
+  
   deploy-runners:
     runs-on: ubuntu-latest
-    if: ${{ github.event.action == 'requested' && !github.event.repository.fork }}
+    needs: is-fork
+    if: ${{ github.event.action == 'requested' && needs.is-fork.outputs.upstream }}
     environment: cuda-test-infra
     steps:
       - name: Checkout
@@ -64,7 +82,8 @@ jobs:
 
   destroy-runners:
     runs-on: ubuntu-latest
-    if: ${{ github.event.action == 'completed' && !github.event.repository.fork }}
+    needs: is-fork
+    if: ${{ github.event.action == 'completed' && needs.is-fork.outputs.upstream }}
     environment: cuda-test-infra
     steps:
       - name: Checkout
