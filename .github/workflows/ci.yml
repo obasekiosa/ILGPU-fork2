@@ -14,14 +14,14 @@ env:
 jobs:
   is-upstream:
     runs-on: ubuntu-latest
-    environment: test-upstream-check
+    environment: cuda-test-infra
     steps:
       - name: Check if repo is upstream
         id: check-if-upstream
         run: |
           fork=$(gh api repos/${{ github.repository }} | jq .fork)
           upstream=false
-          [ "${{ fork }}" == "false" ] && upstream=true
+          [ $fork == "false" ] && upstream=true
           echo "::set-output name=upstream::$upstream"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
