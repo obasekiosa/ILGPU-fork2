@@ -4,7 +4,7 @@ on:
   push:
   pull_request:
   schedule:
-    # Run daily at 00:00 so we get notified if CI is broken before a pull request
+    # Run daily at 00:00 so we get notified if CI is broken before a pull request 
     # is submitted.
   - cron: '0 0 * * *'
 
@@ -169,9 +169,9 @@ jobs:
         shell: bash
         run: |
           if [[ ${{ github.event_name == 'schedule' || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))) }} ]]; then
-            echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"true\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"1\"}"
+            echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"false\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"1\"}"
           else
-            echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"false\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"4\"}"
+            echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"true\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"4\"}"
           fi
 
       - name: Build and test
