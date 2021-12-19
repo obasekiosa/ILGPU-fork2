@@ -21,7 +21,7 @@ jobs:
         run: |
           fork=$(gh api repos/${{ github.repository }} | jq .fork)
           upstream=false
-          [ $fork == "false" ] && upstream=true
+          [ "${{ fork }}" == "false" ] && upstream=true
           echo "::set-output name=upstream::$upstream"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
