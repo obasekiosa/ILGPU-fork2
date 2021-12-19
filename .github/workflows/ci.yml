@@ -12,11 +12,6 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  is-fork:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check if is fork
-        run: gh api repos/${{ github.repository }} | jq .fork
 
   # Check some basic style rules.
   check-style:
