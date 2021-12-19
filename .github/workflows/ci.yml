@@ -13,7 +13,7 @@ env:
 
 jobs:
 
-  # Check some basic style rules.
+  # Check some basic style rules. 
   check-style:
     # Do not run this job for pull requests where both branches are from the same repo.
     # Jobs that depend on this one will be skipped too.
