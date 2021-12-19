@@ -12,6 +12,21 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
+  is-upstream:
+    runs-on: ubuntu-latest
+    environment: test-upstream-check
+    steps:
+      - name: Check if repo is upstream
+        id: check-if-upstream
+        run: |
+          fork=$(gh api repos/${{ github.repository }} | jq .fork)
+          upstream=false
+          [ $fork == "false" ] && upstream=true
+          echo "::set-output name=upstream::$upstream"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+    outputs:
+      upstream: ${{ steps.check-if-upstream.outputs.upstream }}
 
   # Check some basic style rules. 
   check-style:
@@ -72,6 +87,7 @@ jobs:
     # run the CI for each branch push to a fork, and for each pull request originating from a fork.
     if: github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     runs-on: ubuntu-latest
+    needs: is-upstream
     steps:
       - name: Setup OS matrix
         id: setup-os-matrix
@@ -92,7 +108,7 @@ jobs:
             )
           ) && os+=("macos-latest")
 
-          [ "${{ github.event.repository.fork }}" == "false" ] && os+=("cuda")
+          [ "${{ needs.is-upstream.outputs.upstream }}" == "true" ] && os+=("cuda")
 
           echo "::set-output name=os::$(jq -cn '$ARGS.positional' --args ${os[@]})"
     outputs:
