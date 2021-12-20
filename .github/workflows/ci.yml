@@ -24,7 +24,7 @@ jobs:
           [ $fork == "false" ] && upstream=true
           echo "::set-output name=upstream::$upstream"
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       upstream: ${{ steps.check-if-upstream.outputs.upstream }}
 
