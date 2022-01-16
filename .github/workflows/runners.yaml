@@ -45,7 +45,7 @@ jobs:
         with:
           repository: pavlovic-ivan/ephemeral-github-runner-gcp
           ref: main
-          path: 
+          path: ${{ env.GITHUB_WORKSPACE }}/pulumi
 
       - name: Setup Node
         uses: actions/setup-node@v2
@@ -59,7 +59,7 @@ jobs:
           npm install
           pulumi login $GS_BUCKET
           pulumi stack init -s $PULUMI_STACK_NAME
-          pulumi up --diff --config-file ../ILGPU-fork2/config.yaml
+          pulumi up --diff --config-file ./config.yaml
 
   # destroy-runners:
   #   runs-on: ubuntu-latest
