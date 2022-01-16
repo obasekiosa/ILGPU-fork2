@@ -4,31 +4,16 @@ on:
   push:
   pull_request:
   schedule:
-    # Run daily at 00:00 so we get notified if CI is broken before a pull request 
+    # Run daily at 00:00 so we get notified if CI is broken before a pull request
     # is submitted.
-  - cron: '0 0 * * *'
+    - cron:  '0 0 * * *'
 
 env:
   DOTNET_NOLOGO: true
 
 jobs:
-  is-upstream:
-    runs-on: ubuntu-latest
-    environment: cuda-test-infra
-    steps:
-      - name: Check if repo is upstream
-        id: check-if-upstream
-        run: |
-          fork=$(gh api repos/${{ github.repository }} | jq .fork)
-          upstream=false
-          [ $fork == "false" ] && upstream=true
-          echo "::set-output name=upstream::$upstream"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    outputs:
-      upstream: ${{ steps.check-if-upstream.outputs.upstream }}
 
-  # Check some basic style rules. 
+  # Check some basic style rules.
   check-style:
     # Do not run this job for pull requests where both branches are from the same repo.
     # Jobs that depend on this one will be skipped too.
@@ -87,8 +72,16 @@ jobs:
     # run the CI for each branch push to a fork, and for each pull request originating from a fork.
     if: github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     runs-on: ubuntu-latest
-    needs: is-upstream
     steps:
+     - name: Check if repo is upstream
+        id: is-upstream
+        run: |
+          fork=$(gh api repos/${{ github.repository }} | jq .fork)
+          upstream=false
+          [ $fork == "false" ] && upstream=true
+          echo "::set-output name=upstream::$upstream"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup OS matrix
         id: setup-os-matrix
         run: |
@@ -108,7 +101,7 @@ jobs:
             )
           ) && os+=("macos-latest")
 
-          [ "${{ needs.is-upstream.outputs.upstream }}" == "true" ] && os+=("cuda")
+          [ "${{ steps.is-upstream.outputs.upstream }}" == "true" ] && os+=("cuda")
 
           echo "::set-output name=os::$(jq -cn '$ARGS.positional' --args ${os[@]})"
     outputs:
@@ -118,7 +111,7 @@ jobs:
   build:
     # Do not run this job for pull requests where both branches are from the same repo.
     # Jobs that depend on this one will be skipped too.
-    # This prevents duplicate CI runs for our own pull requests, whilst preserving the ability to 
+    # This prevents duplicate CI runs for our own pull requests, whilst preserving the ability to
     # run the CI for each branch push to a fork, and for each pull request originating from a fork.
     if: github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     runs-on: windows-latest
@@ -153,7 +146,7 @@ jobs:
           - os: windows-latest
             library: ILGPU.Algorithms
             framework: net471
-      fail-fast: false
+      fail-fast: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -176,18 +169,17 @@ jobs:
         run: echo ::set-output name=flavor::$([[ "${{ matrix.os }}" == "cuda" ]] && echo "Cuda" || echo "CPU")
 
       - name: Prepare environment
-        id: envvars
+        id: prepare-env
         shell: bash
         run: |
+          echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"false\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"1\"}"
           if [[ ${{ github.event_name == 'schedule' || (github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))) }} ]]; then
-            echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"false\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"1\"}"
-          else
             echo "::set-output name=json::{\"ILGPU_CLEAN_TESTS\":\"true\", \"ILGPU_TEST_PARALLELIZATION_LEVEL\":\"4\"}"
           fi
 
       - name: Build and test
-        run: dotnet test --configuration=Release --framework=${{ matrix.framework }} -p:TreatWarningsAsErrors=true --logger GitHubActions Src/${{ matrix.library }}.Tests.${{ steps.test-flavor.outputs.flavor }} -- /Parallel
-        env: ${{ fromJson(steps.envvars.outputs.json) }}
+        run: dotnet test --configuration=Release --framework=${{ matrix.framework }} -p:TreatWarningsAsErrors=true --logger GitHubActions Src/${{ matrix.library }}.Tests.${{ steps.test-flavor.outputs.flavor }}
+        env: ${{ fromJson(steps.prepare-env.outputs.json) }}
 
   # Ensure that ILGPU libraries are built using the same version tag.
   check-version:
@@ -400,3 +392,54 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "All required checks done"
+
+  # Publish a preview version of the NuGet packages on feedz.io when there is
+  # a push to master.
+  publish-preview:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && !github.event.repository.fork
+    needs: all-required-checks-done
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download NuGet package artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-packages
+      - name: Publish to FeedzIO
+        run: dotnet nuget push "*.nupkg" --api-key ${{ secrets.FEEDZIO_API_KEY }} --source https://f.feedz.io/ilgpu/preview/nuget/index.json
+
+
+  # Create a GitHub release and publish the NuGet packages to nuget.org when
+  # a tag is pushed.
+  publish-release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && !github.event.repository.fork
+    # Depends explictly on the 'check-version' job so we can access its output
+    needs:
+      - all-required-checks-done
+      - check-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download NuGet package artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: nuget-packages
+      - name: Download Samples artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: samples
+
+      # if tag contains "-" treat it as pre-release
+      # example: 1.0.0-beta1
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release v${{ needs.check-version.outputs.version }}
+          draft: true
+          prerelease: ${{ contains(needs.check-version.outputs.version, '-') }}
+          files: |
+            *.nupkg
+            Samples-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to NuGet
+        run: dotnet nuget push "*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

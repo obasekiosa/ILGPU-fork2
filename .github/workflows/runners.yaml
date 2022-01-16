@@ -14,15 +14,14 @@ env:
   GOOGLE_CREDENTIALS: ${{ secrets.GCE_SA_KEY }}
   GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
   PULUMI_STACK_NAME: ${{ github.event.workflow_run.id }}
-  GS_BUCKET: ${{ secrets.GS_BUCKET }}
+  GS_BUCKET: ilgpu_${{ secrets.GS_BUCKET }}
 
 jobs:
   is-upstream:
     runs-on: ubuntu-latest
-    environment: test-upstream-check
     steps:
       - name: Check if repo is upstream
-        id: check-if-upstream
+        id: is-upstream
         run: |
           fork=$(gh api repos/${{ github.repository }} | jq .fork)
           upstream=false
@@ -31,8 +30,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
-      upstream: ${{ steps.check-if-upstream.outputs.upstream }}
-  
+      upstream: ${{ steps.detect-fork-status.outputs.upstream }}
   deploy-runners:
     runs-on: ubuntu-latest
     needs: is-upstream
@@ -42,81 +40,48 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Prepare artifacts
-        run: |
-          mkdir -p artifacts
-          cp config.yaml artifacts
-
-      - name: Upload config
-        uses: actions/upload-artifact@v2
-        with:
-          name: pulumi-config
-          path: artifacts
-          retention-days: 1
-
       - name: Checkout Pulumi Ephemeral Github Runner project
         uses: actions/checkout@v2
         with:
           repository: pavlovic-ivan/ephemeral-github-runner-gcp
           ref: main
-
-      - name: Download config
-        uses: actions/download-artifact@v2
-        with:
-          name: pulumi-config
-          path: artifacts
+          path: 
 
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
           node-version: '14'
 
+# pulumi up --diff --config-file ../ILGPU-fork2/config.yaml -y
       - name: Execute Pulumi
         run: |
           curl -fsSL https://get.pulumi.com | sh
           npm install
           pulumi login $GS_BUCKET
           pulumi stack init -s $PULUMI_STACK_NAME
-          pulumi up --diff --config-file artifacts/config.yaml -y
+          pulumi up --diff --config-file ../ILGPU-fork2/config.yaml
 
-  destroy-runners:
-    runs-on: ubuntu-latest
-    needs: is-upstream
-    if: ${{ github.event.action == 'completed' && needs.is-upstream.outputs.upstream }}
-    environment: cuda-test-infra
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # destroy-runners:
+  #   runs-on: ubuntu-latest
+  #   needs: is-upstream
+  #   if: ${{ github.event.action == 'completed' && needs.is-upstream.outputs.upstream }}
+  #   environment: cuda-test-infra
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Prepare artifacts
-        run: |
-          mkdir -p artifacts
-          cp config.yaml artifacts
+  #     - name: Checkout Pulumi Ephemeral Github Runner project
+  #       uses: actions/checkout@v2
+  #       with:
+  #         repository: pavlovic-ivan/ephemeral-github-runner-gcp
+  #         ref: main
+  #         path: 
 
-      - name: Upload config
-        uses: actions/upload-artifact@v2
-        with:
-          name: pulumi-config
-          path: artifacts
-          retention-days: 1
-
-      - name: Checkout Pulumi Ephemeral Github Runner project
-        uses: actions/checkout@v2
-        with:
-          repository: pavlovic-ivan/ephemeral-github-runner-gcp
-          ref: main
-
-      - name: Download config
-        uses: actions/download-artifact@v2
-        with:
-          name: pulumi-config
-          path: artifacts
-
-      - name: Execute Pulumi
-        run: |
-          curl -fsSL https://get.pulumi.com | sh
-          npm install
-          pulumi login $GS_BUCKET
-          pulumi stack select $PULUMI_STACK_NAME
-          pulumi destroy --config-file artifacts/config.yaml -y
-          pulumi stack rm $PULUMI_STACK_NAME -y
+  #     - name: Execute Pulumi
+  #       run: |
+  #         curl -fsSL https://get.pulumi.com | sh
+  #         npm install
+  #         pulumi login $GS_BUCKET
+  #         pulumi stack select $PULUMI_STACK_NAME
+  #         pulumi destroy --config-file artifacts/config.yaml -y
+  #         pulumi stack rm $PULUMI_STACK_NAME -y
