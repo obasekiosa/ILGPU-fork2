@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          path: main
+          path: ilgpu
 
       - name: Checkout Pulumi Ephemeral Github Runner project
         uses: actions/checkout@v2
@@ -57,12 +57,12 @@ jobs:
 # pulumi up --diff --config-file ../ILGPU-fork2/config.yaml -y
       - name: Execute Pulumi
         run: |
-          ls -la
+          cd pulumi
           curl -fsSL https://get.pulumi.com | sh
           npm install
           pulumi login $GS_BUCKET
           pulumi stack init -s $PULUMI_STACK_NAME
-          pulumi up --diff --config-file ../main/config.yaml
+          pulumi up --diff --config-file ../ilgpu/config.yaml
 
   # destroy-runners:
   #   runs-on: ubuntu-latest
