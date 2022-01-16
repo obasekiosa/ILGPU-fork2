@@ -13,8 +13,8 @@ env:
   PULUMI_CONFIG_PASSPHRASE: ${{ secrets.PULUMI_CONFIG_PASSPHRASE }}
   GOOGLE_CREDENTIALS: ${{ secrets.GCE_SA_KEY }}
   GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
-  PULUMI_STACK_NAME: ${{ github.event.workflow_run.id }}
-  GS_BUCKET: ilgpu_${{ secrets.GS_BUCKET }}
+  PULUMI_STACK_NAME: ilgpu_${{ github.event.workflow_run.id }}
+  GS_BUCKET: ${{ secrets.GS_BUCKET }}
 
 jobs:
   is-upstream:
@@ -25,7 +25,7 @@ jobs:
         run: |
           fork=$(gh api repos/${{ github.repository }} | jq .fork)
           upstream=false
-          [ $fork == "false" ] && upstream=true
+          [[ $fork == "false" ]] && upstream=true
           echo "::set-output name=upstream::$upstream"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
