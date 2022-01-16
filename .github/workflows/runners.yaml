@@ -45,7 +45,7 @@ jobs:
         with:
           repository: pavlovic-ivan/ephemeral-github-runner-gcp
           ref: main
-          path: ${{ env.GITHUB_WORKSPACE }}/pulumi
+          path: pulumi
 
       - name: Setup Node
         uses: actions/setup-node@v2
