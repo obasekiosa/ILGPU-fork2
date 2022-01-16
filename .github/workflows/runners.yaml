@@ -57,6 +57,7 @@ jobs:
 # pulumi up --diff --config-file ../ILGPU-fork2/config.yaml -y
       - name: Execute Pulumi
         run: |
+          ls -la
           curl -fsSL https://get.pulumi.com | sh
           npm install
           pulumi login $GS_BUCKET
