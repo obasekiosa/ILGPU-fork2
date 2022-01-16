@@ -39,6 +39,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+          path: main
 
       - name: Checkout Pulumi Ephemeral Github Runner project
         uses: actions/checkout@v2
@@ -59,7 +60,7 @@ jobs:
           npm install
           pulumi login $GS_BUCKET
           pulumi stack init -s $PULUMI_STACK_NAME
-          pulumi up --diff --config-file ./config.yaml
+          pulumi up --diff --config-file ../main/config.yaml
 
   # destroy-runners:
   #   runs-on: ubuntu-latest
