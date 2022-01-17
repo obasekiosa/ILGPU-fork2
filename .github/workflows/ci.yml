@@ -168,7 +168,7 @@ jobs:
         shell: bash
         run: echo ::set-output name=flavor::$([[ "${{ matrix.os }}" == "cuda" ]] && echo "Cuda" || echo "CPU")
 
-      - name: Prepare environment
+      - name: Prepare environment 
         id: prepare-env
         shell: bash
         run: |
