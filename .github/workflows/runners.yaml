@@ -15,6 +15,7 @@ env:
   GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
   PULUMI_STACK_NAME: ilgpu_${{ github.event.workflow_run.id }}
   GS_BUCKET: ${{ secrets.GS_BUCKET }}
+  GCE_SA_EMAIL: ${{ secrets.GCE_SA_EMAIL }}
 
 jobs:
   is-upstream:
