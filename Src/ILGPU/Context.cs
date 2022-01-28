@@ -520,7 +520,6 @@ namespace ILGPU
             TypeContext.ClearCache(mode);
             DebugInformationManager.ClearCache(mode);
             DefautltILBackend.ClearCache(mode);
-            RuntimeSystem.ClearCache(mode);
 
             base.ClearCache(mode);
         }
