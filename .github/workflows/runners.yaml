@@ -18,12 +18,6 @@ env:
   GCE_SA_EMAIL: ${{ secrets.GCE_SA_EMAIL }}
 
 jobs:
-#       - name: Check if repo is fork
-#         id: is-fork
-#         run: echo "::set-output name=fork::$(gh api repos/${{ github.repository }} | jq .fork)"
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   is-fork:
     runs-on: ubuntu-latest
     steps:
