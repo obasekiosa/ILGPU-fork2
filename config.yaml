@@ -8,6 +8,5 @@ config:
   ephemeral-github-runner:repo: ILGPU-fork2
   ephemeral-github-runner:repoOwner: pavlovic-ivan
   ephemeral-github-runner:runnersCount: 6
-  ephemeral-github-runner:serviceAccountEmail: pulumi@gr-oss-251320.iam.gserviceaccount.com
   ephemeral-github-runner:serviceAccountScopes: https://www.googleapis.com/auth/cloud-platform
   ephemeral-github-runner:zone: europe-west4-a
