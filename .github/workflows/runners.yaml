@@ -51,6 +51,8 @@ jobs:
           npm install
 
       - name: Pulumi login
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GCE_SA_KEY }}
         run: pulumi login ${{ secrets.GS_BUCKET }}
 
       - name: Execute Pulumi
