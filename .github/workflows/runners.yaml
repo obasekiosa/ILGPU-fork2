@@ -65,6 +65,7 @@ jobs:
           PULUMI_STACK_NAME: ilgpu_${{ github.event.workflow_run.id }}
           GCE_SA_EMAIL: ${{ secrets.GCE_SA_EMAIL }}
         run: |
+          cd pulumi
           if [[ ${{ github.event.action == 'requested' }} ]]; then
             pulumi stack init -s $PULUMI_STACK_NAME
             pulumi up --diff --config-file ../ilgpu/config.yaml -y
