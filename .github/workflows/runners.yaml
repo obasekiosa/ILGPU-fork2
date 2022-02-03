@@ -68,7 +68,7 @@ jobs:
             pulumi up --diff --config-file ../ilgpu/config.yaml -y
           elif [[ ${{ github.event.action == 'completed' && needs.is-fork.outputs.fork == 'false' }} ]]; then
             pulumi stack select $PULUMI_STACK_NAME
-            pulumi destroy --config-file artifacts/config.yaml -y
+            pulumi destroy --config-file ../ilgpu/config.yaml -y
             pulumi stack rm $PULUMI_STACK_NAME -y
           else
             exit 1
