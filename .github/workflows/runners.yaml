@@ -66,12 +66,12 @@ jobs:
           GCE_SA_EMAIL: ${{ secrets.GCE_SA_EMAIL }}
         run: |
           cd pulumi
-          if [[ ${{ github.event.action == 'requested' }} ]]; then
+          if [[ ${{ github.event.action }} == 'requested' ]]; then
             # pulumi stack init -s $PULUMI_STACK_NAME
             # pulumi config set ephemeral-github-runner:repo ${{ github.repository }} --config-file ../ilgpu/config.yaml
             # pulumi up --diff --config-file ../ilgpu/config.yaml -y
             echo "Got first if"
-          elif [[ ${{ github.event.action == 'completed' }} ]]; then
+          elif [[ ${{ github.event.action }} == 'completed' ]]; then
             # pulumi stack select $PULUMI_STACK_NAME
             # pulumi destroy --config-file ../ilgpu/config.yaml -y
             # pulumi stack rm $PULUMI_STACK_NAME -y
