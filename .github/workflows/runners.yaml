@@ -67,12 +67,16 @@ jobs:
         run: |
           cd pulumi
           if [[ ${{ github.event.action == 'requested' }} ]]; then
-            pulumi stack init -s $PULUMI_STACK_NAME
-            pulumi up --diff --config-file ../ilgpu/config.yaml -y
+            # pulumi stack init -s $PULUMI_STACK_NAME
+            # pulumi config set ephemeral-github-runner:repo ${{ github.repo }} --config-file ../ilgpu/config.yaml
+            # pulumi up --diff --config-file ../ilgpu/config.yaml -y
+            echo "Got first if"
           elif [[ ${{ github.event.action == 'completed' }} ]]; then
-            pulumi stack select $PULUMI_STACK_NAME
-            pulumi destroy --config-file ../ilgpu/config.yaml -y
-            pulumi stack rm $PULUMI_STACK_NAME -y
+            # pulumi stack select $PULUMI_STACK_NAME
+            # pulumi destroy --config-file ../ilgpu/config.yaml -y
+            # pulumi stack rm $PULUMI_STACK_NAME -y
+            echo "Got else if"
           else
+            echo "Got else"
             exit 1
           fi
