@@ -44,7 +44,6 @@ jobs:
       - name: Setup Pulumi
         working-directory: pulumi
         run: |
-          cd pulumi
           curl -fsSL https://get.pulumi.com | sh
           npm install
 
