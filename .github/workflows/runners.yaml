@@ -63,6 +63,7 @@ jobs:
           GOOGLE_REGION: ${{ secrets.GOOGLE_REGION }}
           PULUMI_STACK_NAME: ilgpu_${{ github.event.workflow_run.id }}
           GCE_SA_EMAIL: ${{ secrets.GCE_SA_EMAIL }}
+          REPO: ${{ github.repository }}
         working-directory: pulumi
         run: |
           if [[ ${{ github.event.action }} == 'requested' ]]; then
