@@ -8,6 +8,12 @@ on:
       - requested
 
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    environment: cuda-test-infra
+    steps:
+      - name: Debug
+        run: ${{ toJson(github) }}
   manage-runners:
     runs-on: ubuntu-latest
     environment: cuda-test-infra
