@@ -43,8 +43,6 @@ jobs:
           GS_BUCKET: ${{ secrets.GS_BUCKET }}
         run: make login
 
-
-      # make $action stack=$PULUMI_STACK_NAME config=../ilgpu/config.yaml auto-approve=-y
       - name: Execute Pulumi
         env:
           PAT: ${{ secrets.PAT }}
@@ -66,4 +64,4 @@ jobs:
               action=down
               ;;
           esac
-          echo $action
+          make $action stack=$PULUMI_STACK_NAME config=../ilgpu/config.yaml auto-approve=-y
