@@ -60,10 +60,10 @@ jobs:
           action=''
           case ${{ github.event.action }} in
             'requested')
-              $action=up
+              action=up
               ;;
             'completed')
-              $action=down
+              action=down
               ;;
           esac
           echo $action
